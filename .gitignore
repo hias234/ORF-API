@@ -1,6 +1,5 @@
 .metadata/**
 RemoteSystemsTempFiles/**
 Servers/**
-.recommenders/**
 
 orfapi/target/**
