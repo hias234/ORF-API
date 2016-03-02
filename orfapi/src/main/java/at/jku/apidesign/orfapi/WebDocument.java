@@ -7,6 +7,12 @@ import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 
+/**
+ * Downloads (and maybe later caches?) the HTML-Document specified in the URL.
+ * 
+ * @author marku
+ *
+ */
 // TODO maybe add caching of documents?
 public class WebDocument {
 
@@ -27,11 +33,17 @@ public class WebDocument {
 	}
 	
 	public String loadFromWeb() throws IOException {
-		InputStream in = url.openStream();
-		String content = IOUtils.toString(in);
-//		FileUtils.writeStringToFile(getProtocolCacheFile(),
+		try (InputStream in = url.openStream()) {
+			String content = IOUtils.toString(in);
+			
+//			FileUtils.writeStringToFile(getProtocolCacheFile(),
 //					this.protocolContent);
+			
+			return content;
+		}
+		catch (IOException e) {
+			throw e;
+		}
 		
-		return content;
 	}
 }
