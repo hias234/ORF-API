@@ -21,7 +21,7 @@ import at.jku.apidesign.orfapi.model.NewsArticle;
 import at.jku.apidesign.orfapi.model.Region;
 
 public final class OrfApiImpl implements OrfApi {
-	
+
 	private String getHeader(Element element, String tagName) {
 		String header = null;
 		Elements headerElement = element.getElementsByTag(tagName);
@@ -63,29 +63,46 @@ public final class OrfApiImpl implements OrfApi {
 
 	@Override
 	public List<NewsArticle> searchTopNews(String query) {
-		return searchNews(getTopNews().stream(), query)
-				.collect(Collectors.toList());
+		return searchNews(getTopNews().stream(), query).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<NewsArticle> getNewsByRegion(Region region) {
+		return getNewsByRegion(region.getUrl());
+	}
+
+	private List<NewsArticle> getNewsByRegion(String url) {
 		Document document;
 		try {
-			document = WebDocument.getJSoupDocument(region.getUrl());
+			document = WebDocument.getJSoupDocument(url);
 		} catch (IOException e) {
 			throw new OrfApiException(e);
 		}
 
-		// TODO paging
+		return getNewsByRegion(url.split("\\?")[0], document);
+	}
+
+	private List<NewsArticle> getNewsByRegion(String baseUrl, Document document) {
 		List<NewsArticle> articles = new ArrayList<>();
 		for (Element story : document.select(".content .storyBox")) {
-			String articleUrl = story.select("a").first().attr("href");
-			articles.add(getNewsArticle(articleUrl));
+			Element articleUrlElement = story.select("a").first();
+			if (articleUrlElement != null) {
+				String articleUrl = articleUrlElement.attr("href");
+				articles.add(getNewsArticle(articleUrl));
+			}
 		}
-		
+
+		Element nextPageElement = document.select(".pageNav .next a").first();
+		if (nextPageElement != null) {
+			String nextPageUrl = baseUrl + nextPageElement.attr("href");
+
+			System.out.println(nextPageUrl);
+			articles.addAll(getNewsByRegion(nextPageUrl));
+		}
+
 		return articles;
 	}
-	
+
 	private NewsArticle getNewsArticle(String url) {
 		Document document;
 		try {
@@ -93,73 +110,75 @@ public final class OrfApiImpl implements OrfApi {
 		} catch (IOException e) {
 			throw new OrfApiException(e);
 		}
-		
+
 		NewsArticle article = new NewsArticle();
-		
+
 		Element contentElement = document.select(".content").first();
 		article.setTitle(getHeader(contentElement, "h1"));
-		
-		Element teaserElement = contentElement.select("p.teaser").first();
-		article.setTeaser(teaserElement.text());
 
-		String bodyStr = getBody(teaserElement);
-		article.setBody(bodyStr);
+		Element teaserElement = contentElement.select("p.teaser").first();
+		if (teaserElement != null) {
+			article.setTeaser(teaserElement.text());
+
+			String bodyStr = getBody(teaserElement);
+			article.setBody(bodyStr);
+		}
 
 		Date date = getDate(contentElement);
 		article.setDate(date);
-		
+
 		article.setRegion(getRegion(url));
-		
+
 		return article;
 	}
 
 	private Region getRegion(String url) {
 		List<Region> regions = Arrays.asList(Region.values());
-		
-		return regions.stream().filter(r -> url.contains(r.getUrl())).findFirst().get();
+
+		return regions.stream().filter(r -> url.contains(r.getUrl())).findFirst().orElse(null);
 	}
 
 	private Date getDate(Element contentElement) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 		Element dateElement = contentElement.select(".date").first();
-		Date date;
-		try {
-			date = dateFormat.parse(dateElement.text().replaceAll("Publiziert am", ""));
-		} catch (ParseException e) {
-			throw new OrfApiException(e);
+		if (dateElement != null) {
+			Date date;
+			try {
+				date = dateFormat.parse(dateElement.text().replaceAll("Publiziert am", ""));
+			} catch (ParseException e) {
+				throw new OrfApiException(e);
+			}
+			return date;
 		}
-		return date;
+		return null;
 	}
 
 	private String getBody(Element teaserElement) {
 		StringBuilder body = new StringBuilder();
-		for (Element bodyElement = teaserElement.nextElementSibling(); bodyElement != null && !bodyElement.classNames().contains("storyMeta"); bodyElement = bodyElement.nextElementSibling()) {
-			if (!bodyElement.tagName().equals("div")){
-				body.append(bodyElement.text());
+		for (Element bodyElement = teaserElement.nextElementSibling(); bodyElement != null
+				&& !bodyElement.classNames().contains("storyMeta"); bodyElement = bodyElement.nextElementSibling()) {
+			if (!bodyElement.tagName().equals("div")) {
+				body.append(bodyElement.text()).append("\n");
 			}
 		}
-		String bodyStr = body.toString();
-		return bodyStr;
+		return body.toString();
 	}
 
 	@Override
 	public List<NewsArticle> searchNewsByRegion(Region region, String query) {
-		return searchNews(getNewsByRegion(region).stream(), query)
-				.collect(Collectors.toList());
+		return searchNews(getNewsByRegion(region).stream(), query).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<NewsArticle> getNewsByRegionAndDate(Region region, Date from, Date to) {
-		return getNewsByRegion(region)
-				.stream()
-				.filter(n -> n.getDate().compareTo(from) >= 0 &&
-							 n.getDate().compareTo(to) <= 0)
+		return getNewsByRegion(region).stream()
+				.filter(n -> n.getDate().compareTo(from) >= 0 && n.getDate().compareTo(to) <= 0)
 				.collect(Collectors.toList());
 	}
-	
+
 	private Stream<NewsArticle> searchNews(Stream<NewsArticle> news, String query) {
 		String queryLowerCase = query.toLowerCase();
-		
+
 		return news.filter(n -> n.getTitle().toLowerCase().contains(queryLowerCase)
 				|| n.getTeaser().toLowerCase().contains(queryLowerCase));
 	}

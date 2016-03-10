@@ -11,8 +11,7 @@ public class OrfApiProgram {
 	public static void main(String[] args) {
 		System.out.println("Hello");
 		
-		List<NewsArticle> austria = new OrfApiImpl().getNewsByRegion(Region.AUSTRIA);
-		
-		austria.forEach(n -> System.out.println(n.getTitle() + "    " + n.getBody()));
+		List<NewsArticle> austria = new OrfApiImpl().getNewsByRegion(Region.VORARLBERG);
+		austria.forEach(n -> System.out.println(n.getTitle() + "    " + n.getBody() + "\n\n\n"));
 	}
 }
