@@ -2,6 +2,7 @@ package at.jku.apidesign.orfapi;
 
 import java.util.Date;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import at.jku.apidesign.orfapi.model.Category;
@@ -30,7 +31,8 @@ public class OrfApiImpl implements OrfApi{
 		
 		return getTopNews()
 				.stream()
-				.filter(n -> n.getTitle().toLowerCase().contains(queryLowerCase))
+				.filter(n -> n.getTitle().toLowerCase().contains(queryLowerCase)
+						|| n.getTeaser().toLowerCase().contains(queryLowerCase))
 				.collect(Collectors.toList());
 	}
 
@@ -42,14 +44,20 @@ public class OrfApiImpl implements OrfApi{
 
 	@Override
 	public List<NewsArticle> searchNewsByRegion(Region region, String query) {
-		// TODO Auto-generated method stub
 		return null;
+				
 	}
 
 	@Override
 	public List<NewsArticle> getNewsByRegionAndDate(Region region, Date from, Date to) {
-		// TODO Auto-generated method stub
-		return null;
+		return getNewsByRegion(region)
+				.stream()
+				.filter(n -> n.getDate().compareTo(from) >= 0 &&
+							 n.getDate().compareTo(to) <= 0)
+				.collect(Collectors.toList());
 	}
 
+	private static final class SearchNewsArticlePredicate implements Predicate<? extends NewsArticle> {
+		
+	}
 }
