@@ -1,7 +1,10 @@
 package at.jku.apidesign.orfapi;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
@@ -66,8 +69,77 @@ public final class OrfApiImpl implements OrfApi {
 
 	@Override
 	public List<NewsArticle> getNewsByRegion(Region region) {
-		// TODO Auto-generated method stub
-		return null;
+		Document document;
+		try {
+			document = WebDocument.getJSoupDocument(region.getUrl());
+		} catch (IOException e) {
+			throw new OrfApiException(e);
+		}
+
+		// TODO paging
+		List<NewsArticle> articles = new ArrayList<>();
+		for (Element story : document.select(".content .storyBox")) {
+			String articleUrl = story.select("a").first().attr("href");
+			articles.add(getNewsArticle(articleUrl));
+		}
+		
+		return articles;
+	}
+	
+	private NewsArticle getNewsArticle(String url) {
+		Document document;
+		try {
+			document = WebDocument.getJSoupDocument(url);
+		} catch (IOException e) {
+			throw new OrfApiException(e);
+		}
+		
+		NewsArticle article = new NewsArticle();
+		
+		Element contentElement = document.select(".content").first();
+		article.setTitle(getHeader(contentElement, "h1"));
+		
+		Element teaserElement = contentElement.select("p.teaser").first();
+		article.setTeaser(teaserElement.text());
+
+		String bodyStr = getBody(teaserElement);
+		article.setBody(bodyStr);
+
+		Date date = getDate(contentElement);
+		article.setDate(date);
+		
+		article.setRegion(getRegion(url));
+		
+		return article;
+	}
+
+	private Region getRegion(String url) {
+		List<Region> regions = Arrays.asList(Region.values());
+		
+		return regions.stream().filter(r -> url.contains(r.getUrl())).findFirst().get();
+	}
+
+	private Date getDate(Element contentElement) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+		Element dateElement = contentElement.select(".date").first();
+		Date date;
+		try {
+			date = dateFormat.parse(dateElement.text().replaceAll("Publiziert am", ""));
+		} catch (ParseException e) {
+			throw new OrfApiException(e);
+		}
+		return date;
+	}
+
+	private String getBody(Element teaserElement) {
+		StringBuilder body = new StringBuilder();
+		for (Element bodyElement = teaserElement.nextElementSibling(); bodyElement != null && !bodyElement.classNames().contains("storyMeta"); bodyElement = bodyElement.nextElementSibling()) {
+			if (!bodyElement.tagName().equals("div")){
+				body.append(bodyElement.text());
+			}
+		}
+		String bodyStr = body.toString();
+		return bodyStr;
 	}
 
 	@Override
