@@ -25,7 +25,7 @@ public class ParserTest {
 				String title = getHeader(article, "h2");
 				System.out.println(title);
 				
-				String text = article.select(".text").get(0).text();
+				String text = article.select(".text p").text();
 				System.out.println(text);
 			}
 			

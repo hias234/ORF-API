@@ -2,6 +2,7 @@ package at.jku.apidesign.orfapi;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import at.jku.apidesign.orfapi.model.Category;
 import at.jku.apidesign.orfapi.model.NewsArticle;
@@ -17,14 +18,20 @@ public class OrfApiImpl implements OrfApi{
 
 	@Override
 	public List<NewsArticle> getTopNewsByCategory(Category category) {
-		// TODO Auto-generated method stub
-		return null;
+		return getTopNews()
+				.stream()
+				.filter(n -> n.getCategory().equals(category))
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<NewsArticle> searchTopNews(String query) {
-		// TODO Auto-generated method stub
-		return null;
+		String queryLowerCase = query.toLowerCase();
+		
+		return getTopNews()
+				.stream()
+				.filter(n -> n.getTitle().toLowerCase().contains(queryLowerCase))
+				.collect(Collectors.toList());
 	}
 
 	@Override
