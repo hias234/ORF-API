@@ -38,15 +38,11 @@ public final class OrfApiImpl implements OrfApi {
 		for (Element ressort : orfDocument.select("main .ticker .ressort")) {
 			String topic = getHeader(ressort, "h1");
 
-			System.out.println(topic);
-			System.out.println();
-
 			for (Element article : ressort.select(".stories article")) {
 				String title = getHeader(article, "h2");
-				System.out.println(title);
-
 				String text = article.select(".text").get(0).text();
-				System.out.println(text);
+
+				topNews.add(new NewsArticle(title, "", text, Category.FOREIGN_AFFAIRS, null, null));
 			}
 
 			System.out.println("------");
@@ -57,19 +53,14 @@ public final class OrfApiImpl implements OrfApi {
 
 	@Override
 	public List<NewsArticle> getTopNewsByCategory(Category category) {
-		return getTopNews()
-				.stream()
-				.filter(n -> n.getCategory().equals(category))
-				.collect(Collectors.toList());
+		return getTopNews().stream().filter(n -> n.getCategory().equals(category)).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<NewsArticle> searchTopNews(String query) {
 		String queryLowerCase = query.toLowerCase();
-		
-		return getTopNews()
-				.stream()
-				.filter(n -> n.getTitle().toLowerCase().contains(queryLowerCase))
+
+		return getTopNews().stream().filter(n -> n.getTitle().toLowerCase().contains(queryLowerCase))
 				.collect(Collectors.toList());
 	}
 
