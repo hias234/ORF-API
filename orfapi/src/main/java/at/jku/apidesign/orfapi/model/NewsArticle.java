@@ -14,6 +14,16 @@ public class NewsArticle {
 
 	}
 
+	public NewsArticle(String title, String teaser, String body, Category category, Region region, Date date) {
+		super();
+		this.title = title;
+		this.teaser = teaser;
+		this.body = body;
+		this.category = category;
+		this.region = region;
+		this.date = date;
+	}
+
 	public String getTitle() {
 		return title;
 	}
