@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,7 +18,7 @@ import at.jku.apidesign.orfapi.model.NewsArticle;
 import at.jku.apidesign.orfapi.model.Region;
 
 public final class OrfApiImpl implements OrfApi {
-
+	
 	private String getHeader(Element element, String tagName) {
 		String header = null;
 		Elements headerElement = element.getElementsByTag(tagName);
@@ -66,12 +67,7 @@ public final class OrfApiImpl implements OrfApi {
 
 	@Override
 	public List<NewsArticle> searchTopNews(String query) {
-		String queryLowerCase = query.toLowerCase();
-		
-		return getTopNews()
-				.stream()
-				.filter(n -> n.getTitle().toLowerCase().contains(queryLowerCase)
-						|| n.getTeaser().toLowerCase().contains(queryLowerCase))
+		return searchNews(getTopNews().stream(), query)
 				.collect(Collectors.toList());
 	}
 
@@ -83,8 +79,8 @@ public final class OrfApiImpl implements OrfApi {
 
 	@Override
 	public List<NewsArticle> searchNewsByRegion(Region region, String query) {
-		return null;
-				
+		return searchNews(getNewsByRegion(region).stream(), query)
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -95,8 +91,11 @@ public final class OrfApiImpl implements OrfApi {
 							 n.getDate().compareTo(to) <= 0)
 				.collect(Collectors.toList());
 	}
-
-	private static final class SearchNewsArticlePredicate implements Predicate<? extends NewsArticle> {
+	
+	private Stream<NewsArticle> searchNews(Stream<NewsArticle> news, String query) {
+		String queryLowerCase = query.toLowerCase();
 		
+		return news.filter(n -> n.getTitle().toLowerCase().contains(queryLowerCase)
+				|| n.getTeaser().toLowerCase().contains(queryLowerCase));
 	}
 }
