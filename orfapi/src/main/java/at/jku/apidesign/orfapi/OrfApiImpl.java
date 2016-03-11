@@ -22,15 +22,6 @@ import at.jku.apidesign.orfapi.model.Region;
 
 public final class OrfApiImpl implements OrfApi {
 
-	private String getHeader(Element element, String tagName) {
-		String header = null;
-		Elements headerElement = element.getElementsByTag(tagName);
-		if (!headerElement.isEmpty()) {
-			header = headerElement.get(0).text();
-		}
-		return header;
-	}
-
 	@Override
 	public List<NewsArticle> getTopNews() throws OrfApiException {
 		List<NewsArticle> topNews = new ArrayList<NewsArticle>();
@@ -63,6 +54,15 @@ public final class OrfApiImpl implements OrfApi {
 		}
 		return topNews;
 	}
+	
+	private String getHeader(Element element, String tagName) {
+		String header = null;
+		Elements headerElement = element.getElementsByTag(tagName);
+		if (!headerElement.isEmpty()) {
+			header = headerElement.get(0).text();
+		}
+		return header;
+	}
 
 	private Category getCategory(String topic) {
 		List<Category> categories = Arrays.asList(Category.values());
@@ -75,7 +75,9 @@ public final class OrfApiImpl implements OrfApi {
 
 	@Override
 	public List<NewsArticle> getTopNewsByCategory(Category category) {
-		return getTopNews().stream().filter(n -> n.getCategory().equals(category)).collect(Collectors.toList());
+		return getTopNews().stream()
+				.filter(n -> n.getCategory() != null && n.getCategory().equals(category))
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -204,7 +206,9 @@ public final class OrfApiImpl implements OrfApi {
 	@Override
 	public List<NewsArticle> getNewsByRegionAndDate(Region region, Date from, Date to) {
 		return getNewsByRegion(region).stream()
-				.filter(n -> n.getDate().compareTo(from) >= 0 && n.getDate().compareTo(to) <= 0)
+				.filter(n -> n.getDate() != null && 
+							 n.getDate().compareTo(from) >= 0 && 
+							 n.getDate().compareTo(to) <= 0)
 				.collect(Collectors.toList());
 	}
 
@@ -212,6 +216,6 @@ public final class OrfApiImpl implements OrfApi {
 		String queryLowerCase = query.toLowerCase();
 
 		return news.filter(n -> n.getTitle().toLowerCase().contains(queryLowerCase)
-				|| n.getTeaser().toLowerCase().contains(queryLowerCase));
+				|| (n.getTeaser() != null && n.getTeaser().toLowerCase().contains(queryLowerCase)));
 	}
 }
