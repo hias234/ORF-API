@@ -23,7 +23,7 @@ import at.jku.apidesign.orfapi.model.Region;
 public final class OrfApiImpl implements OrfApi {
 
 	@Override
-	public List<NewsArticle> getTopNews() throws OrfApiException {
+	public final List<NewsArticle> getTopNews() throws OrfApiException {
 		List<NewsArticle> topNews = new ArrayList<NewsArticle>();
 		Document orfDocument;
 		try {
@@ -74,19 +74,19 @@ public final class OrfApiImpl implements OrfApi {
 	}
 
 	@Override
-	public List<NewsArticle> getTopNewsByCategory(Category category) {
+	public final List<NewsArticle> getTopNewsByCategory(Category category) {
 		return getTopNews().stream()
 				.filter(n -> n.getCategory() != null && n.getCategory().equals(category))
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public List<NewsArticle> searchTopNews(String query) {
+	public final List<NewsArticle> searchTopNews(String query) {
 		return searchNews(getTopNews().stream(), query).collect(Collectors.toList());
 	}
 
 	@Override
-	public List<NewsArticle> getNewsByRegion(Region region) {
+	public final List<NewsArticle> getNewsByRegion(Region region) {
 		return getNewsByRegion(region.getUrl());
 	}
 
@@ -199,12 +199,12 @@ public final class OrfApiImpl implements OrfApi {
 	}
 
 	@Override
-	public List<NewsArticle> searchNewsByRegion(Region region, String query) {
+	public final List<NewsArticle> searchNewsByRegion(Region region, String query) {
 		return searchNews(getNewsByRegion(region).stream(), query).collect(Collectors.toList());
 	}
 
 	@Override
-	public List<NewsArticle> getNewsByRegionAndDate(Region region, Date from, Date to) {
+	public final List<NewsArticle> getNewsByRegionAndDate(Region region, Date from, Date to) {
 		return getNewsByRegion(region).stream()
 				.filter(n -> n.getDate() != null && 
 							 n.getDate().compareTo(from) >= 0 && 
