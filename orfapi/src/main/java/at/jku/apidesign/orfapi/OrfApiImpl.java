@@ -72,12 +72,7 @@ public final class OrfApiImpl implements OrfApi {
 	}
 
 	private List<NewsArticle> getNewsByRegion(String url) {
-		Document document;
-		try {
-			document = WebDocument.getJSoupDocument(url);
-		} catch (IOException e) {
-			throw new OrfApiException(e);
-		}
+		Document document = getJsoupDocument(url);
 
 		return getNewsByRegion(url.split("\\?")[0], document);
 	}
@@ -88,7 +83,10 @@ public final class OrfApiImpl implements OrfApi {
 			Element articleUrlElement = story.select("a").first();
 			if (articleUrlElement != null) {
 				String articleUrl = articleUrlElement.attr("href");
-				articles.add(getNewsArticle(articleUrl));
+				NewsArticle article = getNewsArticle(articleUrl);
+				if (article != null) {
+					articles.add(article);
+				}
 			}
 		}
 
@@ -104,12 +102,7 @@ public final class OrfApiImpl implements OrfApi {
 	}
 
 	private NewsArticle getNewsArticle(String url) {
-		Document document;
-		try {
-			document = WebDocument.getJSoupDocument(url);
-		} catch (IOException e) {
-			throw new OrfApiException(e);
-		}
+		Document document = getJsoupDocument(url);
 
 		NewsArticle article = new NewsArticle();
 
@@ -122,9 +115,14 @@ public final class OrfApiImpl implements OrfApi {
 
 			String bodyStr = getBody(teaserElement);
 			article.setBody(bodyStr);
+		} else {
+			return null;
 		}
 
 		Date date = getDate(contentElement);
+		if (date == null) {
+			return null;
+		}
 		article.setDate(date);
 
 		article.setRegion(getRegion(url));
@@ -132,10 +130,20 @@ public final class OrfApiImpl implements OrfApi {
 		return article;
 	}
 
+	private Document getJsoupDocument(String url) {
+		Document document;
+		try {
+			document = WebDocument.getJSoupDocument(url);
+		} catch (IOException e) {
+			throw new OrfApiException(e);
+		}
+		return document;
+	}
+
 	private Region getRegion(String url) {
 		List<Region> regions = Arrays.asList(Region.values());
 
-		return regions.stream().filter(r -> url.contains(r.getUrl())).findFirst().orElse(null);
+		return regions.stream().filter(r -> url.contains(r.getUrl())).findFirst().orElse(Region.AUSTRIA);
 	}
 
 	private Date getDate(Element contentElement) {
