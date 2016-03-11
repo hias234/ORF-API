@@ -42,18 +42,35 @@ public final class OrfApiImpl implements OrfApi {
 		}
 		for (Element ressort : orfDocument.select("main .ticker .ressort")) {
 			String topic = getHeader(ressort, "h1");
-
+			Category category = getCategory(topic);
+			
 			for (Element article : ressort.select(".stories article")) {
-				String title = getHeader(article, "h2");
-				String text = article.select(".text").get(0).text();
-
-				topNews.add(new NewsArticle(title, "", text, Category.FOREIGN_AFFAIRS, null, null));
+				Element articleUrlElement = article.select("a").first();
+				if (articleUrlElement != null) {
+					String articleUrl = articleUrlElement.attr("href");
+					NewsArticle a = getNewsArticle(articleUrl);
+					if (a != null) {
+						a.setCategory(category);
+						topNews.add(a);
+					}
+				}
+				
+//				String title = getHeader(article, "h2");
+//				String text = article.select(".text").get(0).text();
+//
+//				topNews.add(new NewsArticle(title, "", text, Category.FOREIGN_AFFAIRS, null, null));
 			}
-
-			System.out.println("------");
-			System.out.println();
 		}
 		return topNews;
+	}
+
+	private Category getCategory(String topic) {
+		List<Category> categories = Arrays.asList(Category.values());
+		
+		return categories.stream()
+				.filter(c -> c.getLabel().equalsIgnoreCase(topic))
+				.findFirst()
+				.orElse(Category.OTHER);
 	}
 
 	@Override
@@ -112,12 +129,10 @@ public final class OrfApiImpl implements OrfApi {
 		Element teaserElement = contentElement.select("p.teaser").first();
 		if (teaserElement != null) {
 			article.setTeaser(teaserElement.text());
-
-			String bodyStr = getBody(teaserElement);
-			article.setBody(bodyStr);
-		} else {
-			return null;
 		}
+		
+		String bodyStr = getBody(contentElement, teaserElement);
+		article.setBody(bodyStr);
 
 		Date date = getDate(contentElement);
 		if (date == null) {
@@ -161,9 +176,18 @@ public final class OrfApiImpl implements OrfApi {
 		return null;
 	}
 
-	private String getBody(Element teaserElement) {
+	private String getBody(Element contentElement, Element teaserElement) {
 		StringBuilder body = new StringBuilder();
-		for (Element bodyElement = teaserElement.nextElementSibling(); bodyElement != null
+
+		Element bodyElement;
+		if (teaserElement == null) {
+			bodyElement = contentElement.select("p").first();
+		}
+		else {
+			bodyElement = teaserElement.nextElementSibling();
+		}
+		
+		for (; bodyElement != null
 				&& !bodyElement.classNames().contains("storyMeta"); bodyElement = bodyElement.nextElementSibling()) {
 			if (!bodyElement.tagName().equals("div")) {
 				body.append(bodyElement.text()).append("\n");
