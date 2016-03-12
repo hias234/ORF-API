@@ -13,8 +13,11 @@ import at.jku.apidesign.orfapi.model.Region;
  *
  */
 public interface OrfApi {
+	
 	/**
-	 * @return
+	 * Extracts the NewsArticles of news.orf.at
+	 * 
+	 * @return 
 	 */
 	public List<NewsArticle> getTopNews() throws OrfApiException;
 

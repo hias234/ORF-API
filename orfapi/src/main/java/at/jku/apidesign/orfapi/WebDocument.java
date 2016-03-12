@@ -13,9 +13,7 @@ import org.jsoup.nodes.Document;
  * Downloads (and maybe later caches?) the HTML-Document specified in the URL.
  * 
  * @author marku
- *
  */
-// TODO maybe add caching of documents?
 public class WebDocument {
 
 	private URL url;

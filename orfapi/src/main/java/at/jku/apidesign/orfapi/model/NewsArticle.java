@@ -72,4 +72,11 @@ public class NewsArticle {
 		this.date = date;
 	}
 
+	@Override
+	public String toString() {
+		return "NewsArticle [title=" + title + ", teaser=" + teaser + ", body=" + body + ", category=" + category
+				+ ", region=" + region + ", date=" + date + "]";
+	}
+
+	
 }
