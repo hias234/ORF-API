@@ -37,12 +37,24 @@ public final class OrfNewsApiImpl implements OrfNewsApi {
 		this.useCaching = useCaching;
 	}
 	
+	/**
+	 * Returns if Caching News-Detail HTML-pages is enabled.
+	 * 
+	 * @return true, if caching is enabled.
+	 */
 	public boolean isUsingCaching() {
 		return useCaching;
 	}
 
-	public void useCaching(boolean useCaching) {
+	/**
+	 * Sets if caching for the News-Detail HTML-pages should be used.
+	 * 
+	 * @param useCaching Determines if caching is enabled.
+	 * @return The Instance of the API.
+	 */
+	public OrfNewsApiImpl useCaching(boolean useCaching) {
 		this.useCaching = useCaching;
+		return this;
 	}
 
 	@Override
