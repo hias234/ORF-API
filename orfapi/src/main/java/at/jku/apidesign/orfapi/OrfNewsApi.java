@@ -12,12 +12,12 @@ import at.jku.apidesign.orfapi.model.Region;
  * @author dpril
  *
  */
-public interface OrfApi {
-	
+public interface OrfNewsApi {
+
 	/**
 	 * Extracts the NewsArticles of news.orf.at
 	 * 
-	 * @return 
+	 * @return
 	 */
 	public List<NewsArticle> getTopNews() throws OrfApiException;
 
@@ -53,5 +53,4 @@ public interface OrfApi {
 	 * @return
 	 */
 	public List<NewsArticle> getNewsByRegionAndDate(Region region, Date from, Date to) throws OrfApiException;
-
 }

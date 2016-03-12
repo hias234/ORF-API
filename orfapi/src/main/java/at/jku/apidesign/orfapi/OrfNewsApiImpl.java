@@ -14,8 +14,10 @@ import at.jku.apidesign.orfapi.exception.OrfApiException;
 import at.jku.apidesign.orfapi.model.Category;
 import at.jku.apidesign.orfapi.model.NewsArticle;
 import at.jku.apidesign.orfapi.model.Region;
+import at.jku.apidesign.orfapi.webdocument.OrfWebDocumentUtil;
+import at.jku.apidesign.orfapi.webdocument.WebDocument;
 
-public final class OrfApiImpl implements OrfApi {
+public final class OrfNewsApiImpl implements OrfNewsApi {
 
 	@Override
 	public final List<NewsArticle> getTopNews() throws OrfApiException {
