@@ -36,6 +36,8 @@ public class OrfApiProgram {
 	}
 
 	private static void callApiMethod(int selection) {
+		Long startTimestamp = System.currentTimeMillis();
+		
 		OrfNewsApi orfApi = new OrfNewsApiImpl();
 		switch (selection) {
 		case 1:
@@ -60,6 +62,9 @@ public class OrfApiProgram {
 			System.out.println("No method mapped to your input.");
 			break;
 		}
+		
+		Long durationInIllis = System.currentTimeMillis() - startTimestamp;
+		System.out.println("Call finished, duration: " + durationInIllis + "ms");
 	}
 
 	private static void printNews(List<NewsArticle> news) {
