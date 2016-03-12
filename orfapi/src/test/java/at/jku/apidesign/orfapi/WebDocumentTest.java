@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import at.jku.apidesign.orfapi.webdocument.WebDocument;
+
 public class WebDocumentTest {
 
 	@Test

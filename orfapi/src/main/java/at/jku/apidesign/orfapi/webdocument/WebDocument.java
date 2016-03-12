@@ -1,4 +1,4 @@
-package at.jku.apidesign.orfapi;
+package at.jku.apidesign.orfapi.webdocument;
 
 import java.io.IOException;
 import java.io.InputStream;
