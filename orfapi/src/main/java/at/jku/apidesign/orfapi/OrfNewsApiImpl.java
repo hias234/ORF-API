@@ -19,6 +19,32 @@ import at.jku.apidesign.orfapi.webdocument.WebDocument;
 
 public final class OrfNewsApiImpl implements OrfNewsApi {
 
+	private boolean useCaching;
+	
+	/**
+	 * Creates an instance of an ORF-API. Caching is enabled.
+	 */
+	public OrfNewsApiImpl() {
+		this(true);
+	}
+	
+	/**
+	 * Creates an instance of an ORF-API.
+	 * 
+	 * @param useCaching Determines if the News-Detail HTML-pages should be cached locally.
+	 */
+	public OrfNewsApiImpl(boolean useCaching) {
+		this.useCaching = useCaching;
+	}
+	
+	public boolean isUsingCaching() {
+		return useCaching;
+	}
+
+	public void useCaching(boolean useCaching) {
+		this.useCaching = useCaching;
+	}
+
 	@Override
 	public final List<NewsArticle> getTopNews() throws OrfApiException {
 		List<NewsArticle> topNews = new ArrayList<NewsArticle>();
@@ -112,7 +138,7 @@ public final class OrfNewsApiImpl implements OrfNewsApi {
 	}
 
 	private NewsArticle getNewsArticle(String url) {
-		Document document = OrfWebDocumentUtil.getJsoupDocument(url, true);
+		Document document = OrfWebDocumentUtil.getJsoupDocument(url, useCaching);
 
 		NewsArticle article = new NewsArticle();
 
