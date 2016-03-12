@@ -96,7 +96,6 @@ public final class OrfApiImpl implements OrfApi {
 		if (nextPageElement != null) {
 			String nextPageUrl = baseUrl + nextPageElement.attr("href");
 
-			System.out.println(nextPageUrl);
 			articles.addAll(getNewsByRegion(nextPageUrl));
 		}
 

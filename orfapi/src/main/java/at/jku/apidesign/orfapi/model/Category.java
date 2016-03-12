@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum Category {
-	SPORT("Sport"), FOREIGN_AFFAIRS("Ausland"), OTHER("Anderes");
+	SPORT("Sport"), FOREIGN_AFFAIRS("Ausland"), ECONOMICS("Wirtschaft"), IT("IT"), RELIGION("Religion"), HEALTH(
+			"Gesundheit"), CULTURE("Kultur"), PEOPLE("Leute"), OTHER("Anderes");
 
 	private String label;
 
