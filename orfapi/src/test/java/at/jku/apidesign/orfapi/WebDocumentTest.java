@@ -10,9 +10,9 @@ public class WebDocumentTest {
 
 	@Test
 	public void testLoadWeb() throws IOException {
-		WebDocument doc = new WebDocument("http://news.orf.at");
+		WebDocument doc = new WebDocument("http://news.orf.at", true);
 		
-		String loadedContent = doc.loadFromWeb();
+		String loadedContent = doc.load();
 		assertTrue(loadedContent.length() > 0);
 		
 		System.out.println(loadedContent);

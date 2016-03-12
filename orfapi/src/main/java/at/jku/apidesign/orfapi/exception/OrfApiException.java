@@ -13,4 +13,10 @@ public class OrfApiException extends RuntimeException {
 	public OrfApiException(Throwable throwable) {
 		super(throwable);
 	}
+
+	public OrfApiException(String message, Throwable e) {
+		super(message, e);
+	}
+	
+	
 }

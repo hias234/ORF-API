@@ -22,7 +22,7 @@ public final class OrfApiImpl implements OrfApi {
 		List<NewsArticle> topNews = new ArrayList<NewsArticle>();
 		Document orfDocument;
 		try {
-			orfDocument = WebDocument.getJSoupDocument("http://news.orf.at");
+			orfDocument = WebDocument.getJSoupDocument("http://news.orf.at", false);
 		} catch (IOException ex) {
 			throw new OrfApiException(ex);
 		}
@@ -74,7 +74,7 @@ public final class OrfApiImpl implements OrfApi {
 	}
 
 	private List<NewsArticle> getNewsByRegion(String url) {
-		Document document = OrfWebDocumentUtil.getJsoupDocument(url);
+		Document document = OrfWebDocumentUtil.getJsoupDocument(url, false);
 
 		return getNewsByRegion(url.split("\\?")[0], document);
 	}
@@ -110,7 +110,7 @@ public final class OrfApiImpl implements OrfApi {
 	}
 
 	private NewsArticle getNewsArticle(String url) {
-		Document document = OrfWebDocumentUtil.getJsoupDocument(url);
+		Document document = OrfWebDocumentUtil.getJsoupDocument(url, true);
 
 		NewsArticle article = new NewsArticle();
 
