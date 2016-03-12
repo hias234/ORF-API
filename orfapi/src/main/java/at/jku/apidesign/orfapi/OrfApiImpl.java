@@ -40,6 +40,8 @@ public final class OrfApiImpl implements OrfApi {
 
 			for (Element article : ressort.select(".stories article")) {
 				String title = getHeader(article, "h2");
+				// article.getelement
+
 				String text = article.select(".text").get(0).text();
 
 				topNews.add(new NewsArticle(title, "", text, Category.FOREIGN_AFFAIRS, null, null));
