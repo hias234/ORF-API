@@ -7,8 +7,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
-import at.jku.apidesign.orfapi.OrfApi;
-import at.jku.apidesign.orfapi.OrfApiImpl;
+import at.jku.apidesign.orfapi.OrfNewsApi;
+import at.jku.apidesign.orfapi.OrfNewsApiImpl;
 import at.jku.apidesign.orfapi.model.Category;
 import at.jku.apidesign.orfapi.model.NewsArticle;
 import at.jku.apidesign.orfapi.model.Region;
@@ -36,7 +36,7 @@ public class OrfApiProgram {
 	}
 
 	private static void callApiMethod(int selection) {
-		OrfApi orfApi = new OrfApiImpl();
+		OrfNewsApi orfApi = new OrfNewsApiImpl();
 		switch (selection) {
 		case 1:
 			printNews(orfApi.getTopNews());
