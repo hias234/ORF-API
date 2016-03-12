@@ -48,21 +48,6 @@ public class OrfWebDocumentUtil {
 		return header;
 	}
 
-	public static Date getDate(Element contentElement) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-		Element dateElement = contentElement.select(".date").first();
-		if (dateElement != null) {
-			Date date;
-			try {
-				date = dateFormat.parse(dateElement.text().replaceAll("Publiziert am", ""));
-			} catch (ParseException e) {
-				throw new OrfApiException(e);
-			}
-			return date;
-		}
-		return null;
-	}
-
 	public static Document getJsoupDocument(String url, boolean shouldCache) {
 		Document document;
 		try {
@@ -71,24 +56,5 @@ public class OrfWebDocumentUtil {
 			throw new OrfApiException("Exception get Document with URL: " + url, e);
 		}
 		return document;
-	}
-
-	public static String getBody(Element contentElement, Element teaserElement) {
-		StringBuilder body = new StringBuilder();
-
-		Element bodyElement;
-		if (teaserElement == null) {
-			bodyElement = contentElement.select("p").first();
-		} else {
-			bodyElement = teaserElement.nextElementSibling();
-		}
-
-		for (; bodyElement != null
-				&& !bodyElement.classNames().contains("storyMeta"); bodyElement = bodyElement.nextElementSibling()) {
-			if (!bodyElement.tagName().equals("div")) {
-				body.append(bodyElement.text()).append("\n");
-			}
-		}
-		return body.toString();
 	}
 }

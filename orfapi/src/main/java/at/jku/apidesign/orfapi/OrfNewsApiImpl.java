@@ -11,6 +11,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import at.jku.apidesign.orfapi.exception.OrfApiException;
+import at.jku.apidesign.orfapi.extractor.NewsArticleExtractor;
 import at.jku.apidesign.orfapi.model.Category;
 import at.jku.apidesign.orfapi.model.NewsArticle;
 import at.jku.apidesign.orfapi.model.Region;
@@ -20,6 +21,7 @@ import at.jku.apidesign.orfapi.webdocument.WebDocument;
 public final class OrfNewsApiImpl implements OrfNewsApi {
 
 	private boolean useCaching;
+	private NewsArticleExtractor newsArticleExtractor;
 	
 	/**
 	 * Creates an instance of an ORF-API. Caching is enabled.
@@ -35,6 +37,7 @@ public final class OrfNewsApiImpl implements OrfNewsApi {
 	 */
 	public OrfNewsApiImpl(boolean useCaching) {
 		this.useCaching = useCaching;
+		this.newsArticleExtractor = new NewsArticleExtractor(useCaching);
 	}
 	
 	/**
@@ -74,7 +77,7 @@ public final class OrfNewsApiImpl implements OrfNewsApi {
 				Element articleUrlElement = article.select("a").first();
 				if (articleUrlElement != null) {
 					String articleUrl = articleUrlElement.attr("href");
-					NewsArticle a = getNewsArticle(articleUrl);
+					NewsArticle a = newsArticleExtractor.getNewsArticle(articleUrl);
 					if (a != null) {
 						a.setCategory(category);
 						topNews.add(a);
@@ -125,7 +128,7 @@ public final class OrfNewsApiImpl implements OrfNewsApi {
 			Element articleUrlElement = story.select("a").first();
 			if (articleUrlElement != null) {
 				String articleUrl = articleUrlElement.attr("href");
-				NewsArticle article = getNewsArticle(articleUrl);
+				NewsArticle article = newsArticleExtractor.getNewsArticle(articleUrl);
 				if (article != null) {
 					articles.add(article);
 				}
@@ -149,31 +152,6 @@ public final class OrfNewsApiImpl implements OrfNewsApi {
 				|| (n.getTeaser() != null && n.getTeaser().toLowerCase().contains(queryLowerCase)));
 	}
 
-	private NewsArticle getNewsArticle(String url) {
-		Document document = OrfWebDocumentUtil.getJsoupDocument(url, useCaching);
-
-		NewsArticle article = new NewsArticle();
-
-		Element contentElement = document.select(".content").first();
-		article.setTitle(OrfWebDocumentUtil.getHeader(contentElement, "h1"));
-
-		Element teaserElement = contentElement.select("p.teaser").first();
-		if (teaserElement != null) {
-			article.setTeaser(teaserElement.text());
-		}
-
-		String bodyStr = OrfWebDocumentUtil.getBody(contentElement, teaserElement);
-		article.setBody(bodyStr);
-
-		Date date = OrfWebDocumentUtil.getDate(contentElement);
-		if (date == null) {
-			return null;
-		}
-		article.setDate(date);
-
-		article.setRegion(Region.fromUrl(url));
-
-		return article;
-	}
+	
 
 }
