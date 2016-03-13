@@ -23,17 +23,15 @@ import at.jku.apidesign.orfapi.webdocument.WebDocument;
  */
 public final class OrfTvApi {
 
+	private static final String ORF_TV_URL = "http://tv.orf.at/";
+
 	/**
 	 * @return upcoming shows of ORF1 and ORF2
 	 */
 	public final List<TvShow> getUpcomingTvShows() {
 		List<TvShow> tvShows = new ArrayList<TvShow>();
-		Document orfDocument;
-		try {
-			orfDocument = WebDocument.getJSoupDocument("http://tv.orf.at/", false);
-		} catch (IOException ex) {
-			throw new OrfApiException(ex);
-		}
+		Document orfDocument = WebDocument.getJSoupDocument(ORF_TV_URL, false);
+		
 		for (Element showElement : orfDocument.select(".listitem")) {
 			Element timeElement = showElement.select(".fpstarttime").first();
 			if (timeElement == null) {
@@ -75,22 +73,24 @@ public final class OrfTvApi {
 	 * @param day
 	 * @return the tv program of a tv-station for a specific day
 	 */
-	public List<TvShow> getProgramByTvStationForDay(TvStation tvStation, Date day) {
+	public final List<TvShow> getProgramByTvStationForDay(TvStation tvStation, Date day) {
 		List<TvShow> tvShows = new ArrayList<TvShow>();
-		Document orfDocument;
-		try {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMdd");
-			orfDocument = WebDocument.getJSoupDocument(
-					"http://tv.orf.at/program/" + tvStation.name().toLowerCase() + "/" + dateFormat.format(day), false);
-		} catch (IOException ex) {
-			throw new OrfApiException(ex);
-		}
+		
+		Document orfDocument = getTvDocumentOfTvStationAndDay(tvStation, day);
+		
 		tvShows.addAll(getProgramByDayTime(tvStation, orfDocument, ".tsmorning"));
 		tvShows.addAll(getProgramByDayTime(tvStation, orfDocument, ".tsafternoon"));
 		tvShows.addAll(getProgramByDayTime(tvStation, orfDocument, ".tsevening"));
 		tvShows.addAll(getProgramByDayTime(tvStation, orfDocument, ".tsprimetime"));
 		tvShows.addAll(getProgramByDayTime(tvStation, orfDocument, ".tsnight"));
 		return tvShows;
+	}
+
+	private Document getTvDocumentOfTvStationAndDay(TvStation tvStation, Date day) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMdd");
+		Document orfDocument = WebDocument.getJSoupDocument(
+				"http://tv.orf.at/program/" + tvStation.name().toLowerCase() + "/" + dateFormat.format(day), false);
+		return orfDocument;
 	}
 
 	/**
@@ -100,15 +100,9 @@ public final class OrfTvApi {
 	 * @return the tv program during prime time of a tv-station for a specific
 	 *         day
 	 */
-	public List<TvShow> getPrimetimeProgramByTvStationForDay(TvStation tvStation, Date day) {
-		Document orfDocument;
-		try {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMdd");
-			orfDocument = WebDocument.getJSoupDocument(
-					"http://tv.orf.at/program/" + tvStation.name().toLowerCase() + "/" + dateFormat.format(day), false);
-		} catch (IOException ex) {
-			throw new OrfApiException(ex);
-		}
+	public final List<TvShow> getPrimetimeProgramByTvStationForDay(TvStation tvStation, Date day) {
+		Document orfDocument = getTvDocumentOfTvStationAndDay(tvStation, day);
+		
 		return getProgramByDayTime(tvStation, orfDocument, ".tsprimetime");
 	}
 

@@ -75,12 +75,8 @@ public final class OrfNewsApi {
 	 */
 	public final List<NewsArticle> getTopNews() throws OrfApiException {
 		List<NewsArticle> topNews = new ArrayList<NewsArticle>();
-		Document orfDocument;
-		try {
-			orfDocument = WebDocument.getJSoupDocument(TOP_NEWS_URL, false);
-		} catch (IOException ex) {
-			throw new OrfApiException(ex);
-		}
+		Document orfDocument = WebDocument.getJSoupDocument(TOP_NEWS_URL, false);
+		
 		for (Element ressort : orfDocument.select("main .ticker .ressort")) {
 			String topic = OrfWebDocumentUtil.getHeader(ressort, "h1");
 			Category category = Category.fromLabel(topic);
@@ -157,7 +153,7 @@ public final class OrfNewsApi {
 	}
 
 	private List<NewsArticle> getNewsByRegion(String url) {
-		Document document = OrfWebDocumentUtil.getJsoupDocument(url, false);
+		Document document = WebDocument.getJSoupDocument(url, false);
 
 		return getNewsByRegion(url.split("\\?")[0], document);
 	}

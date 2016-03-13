@@ -11,6 +11,8 @@ import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import at.jku.apidesign.orfapi.exception.OrfApiException;
+
 /**
  * Downloads and caches the HTML-Document specified in the URL.
  * 
@@ -39,9 +41,13 @@ public class WebDocument {
 		}
 	}
 
-	public static Document getJSoupDocument(String url, boolean shouldCache) throws IOException {
+	public static Document getJSoupDocument(String url, boolean shouldCache) throws OrfApiException {
 		WebDocument orfDoc = new WebDocument(url, shouldCache);
-		return Jsoup.parse(orfDoc.load());
+		try {
+			return Jsoup.parse(orfDoc.load());
+		} catch (IOException e) {
+			throw new OrfApiException("API while trying to load ORF-Document with URL: " + url, e);
+		}
 	}
 
 	public String load() throws IOException {

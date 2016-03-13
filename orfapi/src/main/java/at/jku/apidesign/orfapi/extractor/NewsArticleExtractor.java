@@ -11,6 +11,7 @@ import at.jku.apidesign.orfapi.exception.OrfApiException;
 import at.jku.apidesign.orfapi.model.NewsArticle;
 import at.jku.apidesign.orfapi.model.Region;
 import at.jku.apidesign.orfapi.webdocument.OrfWebDocumentUtil;
+import at.jku.apidesign.orfapi.webdocument.WebDocument;
 
 /**
  * Extracts the news article of one detail page.
@@ -28,7 +29,7 @@ public class NewsArticleExtractor {
 	}
 
 	public NewsArticle getNewsArticle(String url) {
-		Document document = OrfWebDocumentUtil.getJsoupDocument(url, useCaching);
+		Document document = WebDocument.getJSoupDocument(url, useCaching);
 
 		NewsArticle article = new NewsArticle();
 

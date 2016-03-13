@@ -47,14 +47,4 @@ public class OrfWebDocumentUtil {
 		}
 		return header;
 	}
-
-	public static Document getJsoupDocument(String url, boolean shouldCache) {
-		Document document;
-		try {
-			document = WebDocument.getJSoupDocument(url, shouldCache);
-		} catch (IOException e) {
-			throw new OrfApiException("Exception get Document with URL: " + url, e);
-		}
-		return document;
-	}
 }
