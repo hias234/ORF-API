@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class TvShow {
 	private String title, subtitle;
-	private String tvStation; // Fernsehsender?
+	private TvStation tvStation; // Fernsehsender?
 	private Date from, to;
 
 	public static final DateFormat TV_DATE_FORMAT = new SimpleDateFormat("HH:mm");
@@ -14,7 +14,7 @@ public class TvShow {
 	public TvShow() {
 	}
 
-	public TvShow(String title, String subtitle, Date from, Date to, String tvSender) {
+	public TvShow(String title, String subtitle, Date from, Date to, TvStation tvSender) {
 		super();
 		this.title = title;
 		this.subtitle = subtitle;
@@ -55,11 +55,11 @@ public class TvShow {
 		this.to = to;
 	}
 
-	public String getTvStation() {
+	public TvStation getTvStation() {
 		return tvStation;
 	}
 
-	public void setTvStation(String tvSender) {
+	public void setTvStation(TvStation tvSender) {
 		this.tvStation = tvSender;
 	}
 
@@ -71,8 +71,8 @@ public class TvShow {
 
 	@Override
 	public String toString() {
-		return getTvStation() + ": " + getTitle() + " - " + getSubtitle() + " (" + TV_DATE_FORMAT.format(getFrom())
-				+ ")";
+		return getTvStation().getTvStationname() + ": " + getTitle() + " - " + getSubtitle() + " ("
+				+ TV_DATE_FORMAT.format(getFrom()) + ")";
 	}
 
 }
