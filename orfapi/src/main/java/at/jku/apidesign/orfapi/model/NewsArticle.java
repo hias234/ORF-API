@@ -1,5 +1,7 @@
 package at.jku.apidesign.orfapi.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class NewsArticle {
@@ -74,9 +76,8 @@ public class NewsArticle {
 
 	@Override
 	public String toString() {
-		return "NewsArticle [title=" + title + ", teaser=" + teaser + ", body=" + body + ", category=" + category
-				+ ", region=" + region + ", date=" + date + "]";
+		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+		return getTitle() + ((getDate() != null) ? " - " + dateFormat.format(getDate()) : "");
 	}
 
-	
 }

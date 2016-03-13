@@ -14,11 +14,13 @@ import at.jku.apidesign.orfapi.extractor.NewsArticleExtractor;
 import at.jku.apidesign.orfapi.model.Category;
 import at.jku.apidesign.orfapi.model.NewsArticle;
 import at.jku.apidesign.orfapi.model.Region;
+import at.jku.apidesign.orfapi.model.SportNewsArticle;
 import at.jku.apidesign.orfapi.util.OrfApiUtil;
 import at.jku.apidesign.orfapi.webdocument.WebDocument;
 
 /**
- * Extracts News-Article from http://news.orf.at and puts them into Java-Objects.
+ * Extracts News-Article from http://news.orf.at and puts them into
+ * Java-Objects.
  * 
  * @author dpril
  *
@@ -26,27 +28,30 @@ import at.jku.apidesign.orfapi.webdocument.WebDocument;
 public final class OrfNewsApi {
 
 	private static final String TOP_NEWS_URL = "http://news.orf.at";
-	
+	private static final String TOP_SPORT_NEWS_URL = "http://sport.orf.at";
+
 	private boolean useCaching;
 	private NewsArticleExtractor newsArticleExtractor;
-	
+
 	/**
 	 * Creates an instance of an ORF-API. Caching is enabled.
 	 */
 	public OrfNewsApi() {
 		this(true);
 	}
-	
+
 	/**
 	 * Creates an instance of an ORF-API.
 	 * 
-	 * @param useCaching Determines if the News-Detail HTML-pages should be cached locally.
+	 * @param useCaching
+	 *            Determines if the News-Detail HTML-pages should be cached
+	 *            locally.
 	 */
 	public OrfNewsApi(boolean useCaching) {
 		this.useCaching = useCaching;
 		this.newsArticleExtractor = new NewsArticleExtractor(useCaching);
 	}
-	
+
 	/**
 	 * Returns if Caching News-Detail HTML-pages is enabled.
 	 * 
@@ -59,7 +64,8 @@ public final class OrfNewsApi {
 	/**
 	 * Sets if caching for the News-Detail HTML-pages should be used.
 	 * 
-	 * @param useCaching Determines if caching is enabled.
+	 * @param useCaching
+	 *            Determines if caching is enabled.
 	 * @return The Instance of the API.
 	 */
 	public OrfNewsApi useCaching(boolean useCaching) {
@@ -75,7 +81,7 @@ public final class OrfNewsApi {
 	public final List<NewsArticle> getTopNews() throws OrfApiException {
 		List<NewsArticle> topNews = new ArrayList<NewsArticle>();
 		Document orfDocument = WebDocument.getJSoupDocument(TOP_NEWS_URL, false);
-		
+
 		for (Element ressort : orfDocument.select("main .ticker .ressort")) {
 			String topic = OrfApiUtil.getHeader(ressort, "h1");
 			Category category = Category.fromLabel(topic);
@@ -98,10 +104,13 @@ public final class OrfNewsApi {
 	/**
 	 * Returns filtered News Articles of only the given category
 	 * 
-	 * @param category The category
+	 * @param category
+	 *            The category
 	 * @return News articles of the given category.
 	 */
-	public final List<NewsArticle> getTopNewsByCategory(Category category) {
+	public final List<? extends NewsArticle> getTopNewsByCategory(Category category) {
+		if (category == Category.SPORT)
+			return getTopSportNews();
 		return getTopNews().stream().filter(n -> n.getCategory() != null && n.getCategory().equals(category))
 				.collect(Collectors.toList());
 	}
@@ -109,7 +118,8 @@ public final class OrfNewsApi {
 	/**
 	 * Searches the top news articles title and teaser for containing words.
 	 * 
-	 * @param query The query
+	 * @param query
+	 *            The query
 	 * @return Search results of matching the query with the top news.
 	 */
 	public final List<NewsArticle> searchTopNews(String query) {
@@ -119,7 +129,8 @@ public final class OrfNewsApi {
 	/**
 	 * Returns the news article of a specific region (e.g. Upper Austria)
 	 * 
-	 * @param region The region.
+	 * @param region
+	 *            The region.
 	 * @return News articles on the region's news page (e.g. ooe.orf.at/news
 	 */
 	public final List<NewsArticle> getNewsByRegion(Region region) {
@@ -129,8 +140,10 @@ public final class OrfNewsApi {
 	/**
 	 * Searches regional news articles' title and teaser for containing words.
 	 * 
-	 * @param region The region.
-	 * @param query The query.
+	 * @param region
+	 *            The region.
+	 * @param query
+	 *            The query.
 	 * @return Search results of matching the query with the regional news.
 	 */
 	public final List<NewsArticle> searchNewsByRegion(Region region, String query) {
@@ -140,9 +153,12 @@ public final class OrfNewsApi {
 	/**
 	 * Filters regional news by dates.
 	 * 
-	 * @param region The region.
-	 * @param from Date from (inclusive)
-	 * @param to Date to (inclusive)
+	 * @param region
+	 *            The region.
+	 * @param from
+	 *            Date from (inclusive)
+	 * @param to
+	 *            Date to (inclusive)
 	 * @return All regional news from the given region and time range.
 	 */
 	public final List<NewsArticle> getNewsByRegionAndDate(Region region, Date from, Date to) {
@@ -187,6 +203,34 @@ public final class OrfNewsApi {
 				|| (n.getTeaser() != null && n.getTeaser().toLowerCase().contains(queryLowerCase)));
 	}
 
-	
+	/**
+	 * Sports are handled different as an individual page exists for it With an
+	 * additional field (type of sport)
+	 * 
+	 * @return
+	 */
+	private List<SportNewsArticle> getTopSportNews() {
+		List<SportNewsArticle> topSportNews = new ArrayList<SportNewsArticle>();
+		Document orfDocument = WebDocument.getJSoupDocument(TOP_SPORT_NEWS_URL, false);
+
+		for (Element ressort : orfDocument.select("main .ticker .ressort")) {
+			String sport = OrfApiUtil.getHeader(ressort, "h1");
+			if (sport.toLowerCase().contains("live")) // Ignore live matches
+				continue;
+			for (Element article : ressort.select(".stories article")) {
+				Element articleUrlElement = article.select("a").first();
+				if (articleUrlElement != null) {
+					String articleUrl = articleUrlElement.attr("href");
+					SportNewsArticle sportarticle = new SportNewsArticle(
+							newsArticleExtractor.getNewsArticle(articleUrl));
+					if (sportarticle != null) {
+						sportarticle.setSport(sport);
+						topSportNews.add(sportarticle);
+					}
+				}
+			}
+		}
+		return topSportNews;
+	}
 
 }

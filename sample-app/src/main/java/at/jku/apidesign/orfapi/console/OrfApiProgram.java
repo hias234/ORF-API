@@ -1,6 +1,5 @@
 package at.jku.apidesign.orfapi.console;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -90,13 +89,11 @@ public class OrfApiProgram {
 		}
 	}
 
-	private static void printNews(List<NewsArticle> news) {
+	private static void printNews(List<? extends NewsArticle> news) {
 		// TODO print whole news
 		// Besser schreiben in file (html, text...)
-		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 		for (NewsArticle article : news) {
-			System.out.println(article.getTitle()
-					+ ((article.getDate() != null) ? " - " + dateFormat.format(article.getDate()) : ""));
+			System.out.println(article.toString());
 		}
 	}
 
