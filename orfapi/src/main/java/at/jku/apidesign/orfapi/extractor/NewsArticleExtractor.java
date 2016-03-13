@@ -12,15 +12,21 @@ import at.jku.apidesign.orfapi.model.NewsArticle;
 import at.jku.apidesign.orfapi.model.Region;
 import at.jku.apidesign.orfapi.webdocument.OrfWebDocumentUtil;
 
+/**
+ * Extracts the news article of one detail page.
+ * 
+ * @author marku
+ *
+ */
 public class NewsArticleExtractor {
 
 	private Boolean useCaching;
-	
+
 	public NewsArticleExtractor(Boolean useCaching) {
 		super();
 		this.useCaching = useCaching;
 	}
-	
+
 	public NewsArticle getNewsArticle(String url) {
 		Document document = OrfWebDocumentUtil.getJsoupDocument(url, useCaching);
 
@@ -47,7 +53,7 @@ public class NewsArticleExtractor {
 
 		return article;
 	}
-	
+
 	public String getBody(Element contentElement, Element teaserElement) {
 		StringBuilder body = new StringBuilder();
 
@@ -66,7 +72,7 @@ public class NewsArticleExtractor {
 		}
 		return body.toString();
 	}
-	
+
 	public Date getDate(Element contentElement) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 		Element dateElement = contentElement.select(".date").first();
