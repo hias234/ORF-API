@@ -12,6 +12,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import at.jku.apidesign.orfapi.exception.OrfApiException;
+import at.jku.apidesign.orfapi.util.OrfApiUtil;
 
 /**
  * Downloads and caches the HTML-Document specified in the URL.
@@ -83,7 +84,7 @@ public class WebDocument {
 
 	private File getCacheFile() {
 		String cacheFileName = url.toString().replaceAll("[\\\\/:\\.]", "_");
-		return new File(OrfWebDocumentUtil.getCachePath(CACHE_SUB_DIRECTORY, cacheFileName));
+		return new File(OrfApiUtil.getCachePath(CACHE_SUB_DIRECTORY, cacheFileName));
 	}
 	
 	

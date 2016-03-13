@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import at.jku.apidesign.orfapi.OrfNewsApi;
-import at.jku.apidesign.orfapi.OrfNewsApi;
-import at.jku.apidesign.orfapi.OrfTvApi;
 import at.jku.apidesign.orfapi.OrfTvApi;
 import at.jku.apidesign.orfapi.model.Category;
 import at.jku.apidesign.orfapi.model.NewsArticle;

@@ -1,6 +1,5 @@
 package at.jku.apidesign.orfapi;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,7 +14,7 @@ import at.jku.apidesign.orfapi.extractor.NewsArticleExtractor;
 import at.jku.apidesign.orfapi.model.Category;
 import at.jku.apidesign.orfapi.model.NewsArticle;
 import at.jku.apidesign.orfapi.model.Region;
-import at.jku.apidesign.orfapi.webdocument.OrfWebDocumentUtil;
+import at.jku.apidesign.orfapi.util.OrfApiUtil;
 import at.jku.apidesign.orfapi.webdocument.WebDocument;
 
 /**
@@ -78,7 +77,7 @@ public final class OrfNewsApi {
 		Document orfDocument = WebDocument.getJSoupDocument(TOP_NEWS_URL, false);
 		
 		for (Element ressort : orfDocument.select("main .ticker .ressort")) {
-			String topic = OrfWebDocumentUtil.getHeader(ressort, "h1");
+			String topic = OrfApiUtil.getHeader(ressort, "h1");
 			Category category = Category.fromLabel(topic);
 
 			for (Element article : ressort.select(".stories article")) {

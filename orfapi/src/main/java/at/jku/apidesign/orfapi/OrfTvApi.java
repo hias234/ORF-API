@@ -1,6 +1,5 @@
 package at.jku.apidesign.orfapi;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,7 +9,6 @@ import java.util.List;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import at.jku.apidesign.orfapi.exception.OrfApiException;
 import at.jku.apidesign.orfapi.model.TvShow;
 import at.jku.apidesign.orfapi.model.TvStation;
 import at.jku.apidesign.orfapi.webdocument.WebDocument;

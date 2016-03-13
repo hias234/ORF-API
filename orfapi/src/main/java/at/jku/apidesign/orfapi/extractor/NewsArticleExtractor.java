@@ -10,7 +10,7 @@ import org.jsoup.nodes.Element;
 import at.jku.apidesign.orfapi.exception.OrfApiException;
 import at.jku.apidesign.orfapi.model.NewsArticle;
 import at.jku.apidesign.orfapi.model.Region;
-import at.jku.apidesign.orfapi.webdocument.OrfWebDocumentUtil;
+import at.jku.apidesign.orfapi.util.OrfApiUtil;
 import at.jku.apidesign.orfapi.webdocument.WebDocument;
 
 /**
@@ -34,7 +34,7 @@ public class NewsArticleExtractor {
 		NewsArticle article = new NewsArticle();
 
 		Element contentElement = document.select(".content").first();
-		article.setTitle(OrfWebDocumentUtil.getHeader(contentElement, "h1"));
+		article.setTitle(OrfApiUtil.getHeader(contentElement, "h1"));
 
 		Element teaserElement = contentElement.select("p.teaser").first();
 		if (teaserElement != null) {
