@@ -51,7 +51,16 @@ public final class OrfTvApiImpl implements OrfTvApi {
 	}
 
 	@Override
-	public final List<TvShow> getDailyProgramBySender(String tvSender) {
+	public final List<TvShow> getDailyProgramByTvStation(String tvStation) {
+		return getProgramByTvStationForDay(tvStation, new Date()); // Use
+																	// ForDay-Method
+																	// with
+																	// current
+																	// date
+	}
+
+	@Override
+	public List<TvShow> getProgramByTvStationForDay(String tvStation, Date day) {
 		// TODO Auto-generated method stub
 		return null;
 	}
