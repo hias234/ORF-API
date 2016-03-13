@@ -1,21 +1,26 @@
 package at.jku.apidesign.orfapi.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class TvShow {
 	private String title, subtitle;
-	private String tvSender; // Fernsehsender?
+	private TvStation tvStation; // Fernsehsender?
 	private Date from, to;
+
+	public static final DateFormat TV_DATE_FORMAT = new SimpleDateFormat("HH:mm");
 
 	public TvShow() {
 	}
 
-	public TvShow(String title, String subtitle, Date from, Date to) {
+	public TvShow(String title, String subtitle, Date from, Date to, TvStation tvSender) {
 		super();
 		this.title = title;
 		this.subtitle = subtitle;
 		this.from = from;
 		this.to = to;
+		this.tvStation = tvSender;
 	}
 
 	public String getTitle() {
@@ -50,12 +55,12 @@ public class TvShow {
 		this.to = to;
 	}
 
-	public String getTvSender() {
-		return tvSender;
+	public TvStation getTvStation() {
+		return tvStation;
 	}
 
-	public void setTvSender(String tvSender) {
-		this.tvSender = tvSender;
+	public void setTvStation(TvStation tvSender) {
+		this.tvStation = tvSender;
 	}
 
 	public long getDurationInMinutes() {
@@ -63,4 +68,11 @@ public class TvShow {
 		long diffMinutes = diff / (60 * 1000) % 60;
 		return diffMinutes;
 	}
+
+	@Override
+	public String toString() {
+		return getTvStation().getTvStationname() + ": " + getTitle() + " - " + getSubtitle() + " ("
+				+ TV_DATE_FORMAT.format(getFrom()) + ")";
+	}
+
 }

@@ -9,9 +9,13 @@ import java.util.Scanner;
 
 import at.jku.apidesign.orfapi.OrfNewsApi;
 import at.jku.apidesign.orfapi.OrfNewsApiImpl;
+import at.jku.apidesign.orfapi.OrfTvApi;
+import at.jku.apidesign.orfapi.OrfTvApiImpl;
 import at.jku.apidesign.orfapi.model.Category;
 import at.jku.apidesign.orfapi.model.NewsArticle;
 import at.jku.apidesign.orfapi.model.Region;
+import at.jku.apidesign.orfapi.model.TvShow;
+import at.jku.apidesign.orfapi.model.TvStation;
 
 public class OrfApiProgram {
 	private static final Scanner s = new Scanner(System.in);
@@ -25,6 +29,11 @@ public class OrfApiProgram {
 		System.out.println("(5)...searchNewsByRegion");
 		System.out.println("(6)...getNewsByRegionAndDate");
 
+		System.out.println("(7)...getUpcomingTvShows");
+		System.out.println("(8)...getDailyProgramByTvStation");
+		System.out.println("(9)...getProgramByTvStationForDay");
+		System.out.println("(10)...getPrimetimeProgramByTvStationForDay");
+
 		do {
 			if (s.hasNextInt()) {
 				int selection = s.nextInt();
@@ -37,8 +46,9 @@ public class OrfApiProgram {
 
 	private static void callApiMethod(int selection) {
 		Long startTimestamp = System.currentTimeMillis();
-		
+
 		OrfNewsApi orfApi = new OrfNewsApiImpl();
+		OrfTvApi orfTvApi = new OrfTvApiImpl();
 		switch (selection) {
 		case 1:
 			printNews(orfApi.getTopNews());
@@ -58,13 +68,28 @@ public class OrfApiProgram {
 		case 6:
 			printNews(orfApi.getNewsByRegionAndDate(enterRegion(), enterDate(), enterDate()));
 			break;
+		case 7:
+			printTvProgram(orfTvApi.getUpcomingTvShows());
+			break;
+		case 8:
+			printTvProgram(orfTvApi.getDailyProgramByTvStation(enterTvStation()));
+		case 9:
+			printTvProgram(orfTvApi.getProgramByTvStationForDay(enterTvStation(), enterDate()));
+		case 10:
+			printTvProgram(orfTvApi.getPrimetimeProgramByTvStationForDay(enterTvStation(), enterDate()));
 		default:
 			System.out.println("No method mapped to your input.");
 			break;
 		}
-		
+
 		Long durationInIllis = System.currentTimeMillis() - startTimestamp;
 		System.out.println("Call finished, duration: " + durationInIllis + "ms");
+	}
+
+	private static void printTvProgram(List<TvShow> shows) {
+		for (TvShow show : shows) {
+			System.out.println(show.toString());
+		}
 	}
 
 	private static void printNews(List<NewsArticle> news) {
@@ -105,6 +130,22 @@ public class OrfApiProgram {
 		if (s.hasNextInt()) {
 			int regionIdx = s.nextInt() - 1;
 			return Region.values()[regionIdx];
+		}
+		return null;
+	}
+
+	private static TvStation enterTvStation() {
+		System.out.println("Tv station:");
+
+		for (int i = 0; i < TvStation.values().length; i++) {
+			if (i > 0)
+				System.out.print(", ");
+			System.out.print(TvStation.values()[i].name() + "(" + (i + 1) + ")");
+		}
+		System.out.println();
+		if (s.hasNextInt()) {
+			int tvStationIdx = s.nextInt() - 1;
+			return TvStation.values()[tvStationIdx];
 		}
 		return null;
 	}
