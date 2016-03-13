@@ -123,7 +123,7 @@ public final class OrfNewsApi {
 	 * @return News articles on the region's news page (e.g. ooe.orf.at/news
 	 */
 	public final List<NewsArticle> getNewsByRegion(Region region) {
-		return getNewsByRegion(region.getUrl());
+		return getNewsByRegionUrl(region.getUrl());
 	}
 
 	/**
@@ -151,13 +151,13 @@ public final class OrfNewsApi {
 				.collect(Collectors.toList());
 	}
 
-	private List<NewsArticle> getNewsByRegion(String url) {
+	private List<NewsArticle> getNewsByRegionUrl(String url) {
 		Document document = WebDocument.getJSoupDocument(url, false);
 
-		return getNewsByRegion(url.split("\\?")[0], document);
+		return getNewsByRegionUrlAndDocument(url.split("\\?")[0], document);
 	}
 
-	private List<NewsArticle> getNewsByRegion(String baseUrl, Document document) {
+	private List<NewsArticle> getNewsByRegionUrlAndDocument(String baseUrl, Document document) {
 		List<NewsArticle> articles = new ArrayList<>();
 		for (Element story : document.select(".content .storyBox")) {
 			Element articleUrlElement = story.select("a").first();
@@ -174,7 +174,7 @@ public final class OrfNewsApi {
 		if (nextPageElement != null) {
 			String nextPageUrl = baseUrl + nextPageElement.attr("href");
 
-			articles.addAll(getNewsByRegion(nextPageUrl));
+			articles.addAll(getNewsByRegionUrl(nextPageUrl));
 		}
 
 		return articles;
