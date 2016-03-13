@@ -1,6 +1,7 @@
 package at.jku.apidesign.orfapi;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,12 +24,28 @@ public final class OrfTvApiImpl implements OrfTvApi {
 		} catch (IOException ex) {
 			throw new OrfApiException(ex);
 		}
-		for (Element showElement : orfDocument.select("listitem")) {
-			String timeFrom = showElement.select("fpstarttime").text();
+		for (Element showElement : orfDocument.select(".listitem")) {
+			Element timeElement = showElement.select(".fpstarttime").first();
+			if (timeElement == null) {
+				continue;
+			}
+			String timeFromString = timeElement.getElementsByTag("span").get(1).text();
+			Date timeFrom;
+			try {
+				timeFrom = TvShow.TV_DATE_FORMAT.parse(timeFromString);
+			} catch (ParseException e) {
+				e.printStackTrace();
+				continue;
+			}
+			String tvStation = "";
+			if (timeElement.getElementsByTag("span").get(1).hasClass("orf1text"))
+				tvStation = "ORF1";
+			else if (timeElement.getElementsByTag("span").get(1).hasClass("orf2text"))
+				tvStation = "ORF2";
 			String title = showElement.getElementsByTag("h2").text();
 			String subtitle = showElement.getElementsByTag("h3").text();
 
-			tvShows.add(new TvShow(title, subtitle, new Date(), new Date()));
+			tvShows.add(new TvShow(title, subtitle, timeFrom, new Date(), tvStation));
 		}
 		return tvShows;
 	}
