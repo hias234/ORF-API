@@ -1,4 +1,4 @@
-# ORF-API
+# ORF-API v1.0
 
 The website of the ORF (http://orf.at/) contains a lot of interesting information which can be extracted by directly calling and reading the page content. News reports (sports, economics, religion....), tv programs and more are accessible on multiple subpages/suburls. This API extracts this unstructured data and returns it in structured form (Java Objects).
 
