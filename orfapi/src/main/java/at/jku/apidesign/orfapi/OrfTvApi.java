@@ -9,6 +9,7 @@ import java.util.List;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import at.jku.apidesign.orfapi.exception.OrfApiException;
 import at.jku.apidesign.orfapi.model.TvShow;
 import at.jku.apidesign.orfapi.model.TvStation;
 import at.jku.apidesign.orfapi.webdocument.WebDocument;
@@ -26,7 +27,7 @@ public final class OrfTvApi {
 	/**
 	 * @return upcoming shows of ORF1 and ORF2
 	 */
-	public final List<TvShow> getUpcomingTvShows() {
+	public final List<TvShow> getUpcomingTvShows() throws OrfApiException {
 		List<TvShow> tvShows = new ArrayList<TvShow>();
 		Document orfDocument = WebDocument.getJSoupDocument(ORF_TV_URL, false);
 
@@ -61,7 +62,7 @@ public final class OrfTvApi {
 	 *            (ORF1, ORF2, ORF3, Orf Sport +)
 	 * @return the program of the current day
 	 */
-	public final List<TvShow> getDailyProgramByTvStation(TvStation tvStation) {
+	public final List<TvShow> getDailyProgramByTvStation(TvStation tvStation) throws OrfApiException {
 		return getProgramByTvStationForDay(tvStation, new Date());
 	}
 
@@ -71,7 +72,7 @@ public final class OrfTvApi {
 	 * @param day
 	 * @return the tv program of a tv-station for a specific day
 	 */
-	public final List<TvShow> getProgramByTvStationForDay(TvStation tvStation, Date day) {
+	public final List<TvShow> getProgramByTvStationForDay(TvStation tvStation, Date day) throws OrfApiException {
 		List<TvShow> tvShows = new ArrayList<TvShow>();
 
 		Document orfDocument = getTvDocumentOfTvStationAndDay(tvStation, day);
@@ -91,7 +92,8 @@ public final class OrfTvApi {
 	 * @return the tv program during prime time of a tv-station for a specific
 	 *         day
 	 */
-	public final List<TvShow> getPrimetimeProgramByTvStationForDay(TvStation tvStation, Date day) {
+	public final List<TvShow> getPrimetimeProgramByTvStationForDay(TvStation tvStation, Date day)
+			throws OrfApiException {
 		Document orfDocument = getTvDocumentOfTvStationAndDay(tvStation, day);
 
 		return getProgramByDayTime(tvStation, orfDocument, ".tsprimetime");

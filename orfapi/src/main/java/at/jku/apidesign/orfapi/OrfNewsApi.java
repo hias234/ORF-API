@@ -79,26 +79,30 @@ public final class OrfNewsApi {
 	 * @return All Articles on the Top News Page of the ORF
 	 */
 	public final List<NewsArticle> getTopNews() throws OrfApiException {
-		List<NewsArticle> topNews = new ArrayList<NewsArticle>();
-		Document orfDocument = WebDocument.getJSoupDocument(TOP_NEWS_URL, false);
+		try {
+			List<NewsArticle> topNews = new ArrayList<NewsArticle>();
+			Document orfDocument = WebDocument.getJSoupDocument(TOP_NEWS_URL, false);
 
-		for (Element ressort : orfDocument.select("main .ticker .ressort")) {
-			String topic = OrfApiUtil.getHeader(ressort, "h1");
-			Category category = Category.fromLabel(topic);
+			for (Element ressort : orfDocument.select("main .ticker .ressort")) {
+				String topic = OrfApiUtil.getHeader(ressort, "h1");
+				Category category = Category.fromLabel(topic);
 
-			for (Element article : ressort.select(".stories article")) {
-				Element articleUrlElement = article.select("a").first();
-				if (articleUrlElement != null) {
-					String articleUrl = articleUrlElement.attr("href");
-					NewsArticle a = newsArticleExtractor.getNewsArticle(articleUrl);
-					if (a != null) {
-						a.setCategory(category);
-						topNews.add(a);
+				for (Element article : ressort.select(".stories article")) {
+					Element articleUrlElement = article.select("a").first();
+					if (articleUrlElement != null) {
+						String articleUrl = articleUrlElement.attr("href");
+						NewsArticle a = newsArticleExtractor.getNewsArticle(articleUrl);
+						if (a != null) {
+							a.setCategory(category);
+							topNews.add(a);
+						}
 					}
 				}
 			}
+			return topNews;
+		} catch (Exception e) {
+			throw new OrfApiException(e);
 		}
-		return topNews;
 	}
 
 	/**
@@ -108,7 +112,7 @@ public final class OrfNewsApi {
 	 *            The category
 	 * @return News articles of the given category.
 	 */
-	public final List<? extends NewsArticle> getTopNewsByCategory(Category category) {
+	public final List<? extends NewsArticle> getTopNewsByCategory(Category category) throws OrfApiException {
 		if (category == Category.SPORT)
 			return getTopSportNews();
 		return getTopNews().stream().filter(n -> n.getCategory() != null && n.getCategory().equals(category))
@@ -122,7 +126,7 @@ public final class OrfNewsApi {
 	 *            The query
 	 * @return Search results of matching the query with the top news.
 	 */
-	public final List<NewsArticle> searchTopNews(String query) {
+	public final List<NewsArticle> searchTopNews(String query) throws OrfApiException {
 		return searchNews(getTopNews().stream(), query).collect(Collectors.toList());
 	}
 
@@ -133,7 +137,7 @@ public final class OrfNewsApi {
 	 *            The region.
 	 * @return News articles on the region's news page (e.g. ooe.orf.at/news
 	 */
-	public final List<NewsArticle> getNewsByRegion(Region region) {
+	public final List<NewsArticle> getNewsByRegion(Region region) throws OrfApiException {
 		return getNewsByRegionUrl(region.getUrl());
 	}
 
@@ -146,7 +150,7 @@ public final class OrfNewsApi {
 	 *            The query.
 	 * @return Search results of matching the query with the regional news.
 	 */
-	public final List<NewsArticle> searchNewsByRegion(Region region, String query) {
+	public final List<NewsArticle> searchNewsByRegion(Region region, String query) throws OrfApiException {
 		return searchNews(getNewsByRegion(region).stream(), query).collect(Collectors.toList());
 	}
 
@@ -161,7 +165,7 @@ public final class OrfNewsApi {
 	 *            Date to (inclusive)
 	 * @return All regional news from the given region and time range.
 	 */
-	public final List<NewsArticle> getNewsByRegionAndDate(Region region, Date from, Date to) {
+	public final List<NewsArticle> getNewsByRegionAndDate(Region region, Date from, Date to) throws OrfApiException {
 		return getNewsByRegion(region).stream()
 				.filter(n -> n.getDate() != null && n.getDate().compareTo(from) >= 0 && n.getDate().compareTo(to) <= 0)
 				.collect(Collectors.toList());
