@@ -29,7 +29,7 @@ public final class OrfTvApi {
 	public final List<TvShow> getUpcomingTvShows() {
 		List<TvShow> tvShows = new ArrayList<TvShow>();
 		Document orfDocument = WebDocument.getJSoupDocument(ORF_TV_URL, false);
-		
+
 		for (Element showElement : orfDocument.select(".listitem")) {
 			Element timeElement = showElement.select(".fpstarttime").first();
 			if (timeElement == null) {
@@ -59,7 +59,7 @@ public final class OrfTvApi {
 	/**
 	 * @param tvSender
 	 *            (ORF1, ORF2, ORF3, Orf Sport +)
-	 * @return
+	 * @return the program of the current day
 	 */
 	public final List<TvShow> getDailyProgramByTvStation(TvStation tvStation) {
 		return getProgramByTvStationForDay(tvStation, new Date());
@@ -73,22 +73,15 @@ public final class OrfTvApi {
 	 */
 	public final List<TvShow> getProgramByTvStationForDay(TvStation tvStation, Date day) {
 		List<TvShow> tvShows = new ArrayList<TvShow>();
-		
+
 		Document orfDocument = getTvDocumentOfTvStationAndDay(tvStation, day);
-		
+
 		tvShows.addAll(getProgramByDayTime(tvStation, orfDocument, ".tsmorning"));
 		tvShows.addAll(getProgramByDayTime(tvStation, orfDocument, ".tsafternoon"));
 		tvShows.addAll(getProgramByDayTime(tvStation, orfDocument, ".tsevening"));
 		tvShows.addAll(getProgramByDayTime(tvStation, orfDocument, ".tsprimetime"));
 		tvShows.addAll(getProgramByDayTime(tvStation, orfDocument, ".tsnight"));
 		return tvShows;
-	}
-
-	private Document getTvDocumentOfTvStationAndDay(TvStation tvStation, Date day) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMdd");
-		Document orfDocument = WebDocument.getJSoupDocument(
-				"http://tv.orf.at/program/" + tvStation.name().toLowerCase() + "/" + dateFormat.format(day), false);
-		return orfDocument;
 	}
 
 	/**
@@ -100,8 +93,15 @@ public final class OrfTvApi {
 	 */
 	public final List<TvShow> getPrimetimeProgramByTvStationForDay(TvStation tvStation, Date day) {
 		Document orfDocument = getTvDocumentOfTvStationAndDay(tvStation, day);
-		
+
 		return getProgramByDayTime(tvStation, orfDocument, ".tsprimetime");
+	}
+
+	private Document getTvDocumentOfTvStationAndDay(TvStation tvStation, Date day) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMdd");
+		Document orfDocument = WebDocument.getJSoupDocument(
+				"http://tv.orf.at/program/" + tvStation.name().toLowerCase() + "/" + dateFormat.format(day), false);
+		return orfDocument;
 	}
 
 	private List<TvShow> getProgramByDayTime(TvStation tvStation, Document orfDocument, String dayTimeStringCss) {
