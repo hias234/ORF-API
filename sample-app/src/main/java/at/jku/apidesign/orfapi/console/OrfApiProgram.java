@@ -18,7 +18,24 @@ public class OrfApiProgram {
 	private static final Scanner s = new Scanner(System.in);
 
 	public static void main(String[] args) {
-		System.out.println("Welcome to the ORF-News API (exit...x):");
+		System.out.println("Welcome to the ORF-News API (exit...x, info...i):");
+
+		String input = "";
+		do {
+			if (s.hasNextInt()) {
+				int selection = s.nextInt();
+				callApiMethod(selection);
+			} else if (s.hasNextLine()) {
+				input = s.nextLine();
+				if (input.equals("i"))
+					printProgramInfo();
+			}
+		} while (!input.equals("x"));
+
+		System.out.println("Application closed!");
+	}
+
+	private static void printProgramInfo() {
 		System.out.println("(1)...getTopNews");
 		System.out.println("(2)...getTopNewsByCategory");
 		System.out.println("(3)...searchTopNews");
@@ -30,15 +47,6 @@ public class OrfApiProgram {
 		System.out.println("(8)...getDailyProgramByTvStation");
 		System.out.println("(9)...getProgramByTvStationForDay");
 		System.out.println("(10)...getPrimetimeProgramByTvStationForDay");
-
-		do {
-			if (s.hasNextInt()) {
-				int selection = s.nextInt();
-				callApiMethod(selection);
-			}
-		} while (!s.nextLine().toLowerCase().equals("x"));
-
-		System.out.println("Application closed!");
 	}
 
 	private static void callApiMethod(int selection) {
@@ -70,10 +78,13 @@ public class OrfApiProgram {
 			break;
 		case 8:
 			printTvProgram(orfTvApi.getDailyProgramByTvStation(enterTvStation()));
+			break;
 		case 9:
 			printTvProgram(orfTvApi.getProgramByTvStationForDay(enterTvStation(), enterDate()));
+			break;
 		case 10:
 			printTvProgram(orfTvApi.getPrimetimeProgramByTvStationForDay(enterTvStation(), enterDate()));
+			break;
 		default:
 			System.out.println("No method mapped to your input.");
 			break;
@@ -160,10 +171,12 @@ public class OrfApiProgram {
 	private static Date enterDate() {
 		try {
 			System.out.println("Enter date (dd-MM-yyyy):");
-			return new SimpleDateFormat("dd-MM-yyyy").parse(s.nextLine());
+			if (s.hasNextLine()) {
+				return new SimpleDateFormat("dd-MM-yyyy").parse(s.nextLine());
+			}
 		} catch (ParseException e) {
-			System.out.println("Wrong date entered - todays date will be used!");
-			return new Date();
 		}
+		System.out.println("Wrong date entered - todays date will be used!");
+		return new Date();
 	}
 }
